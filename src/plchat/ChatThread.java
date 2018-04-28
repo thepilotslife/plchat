@@ -140,7 +140,10 @@ class ChatThread extends Thread
             } while (!isend);
         } catch (Exception e) {
             Logger.log(e);
-            Logger.log("exception while parsing batch of messages, response is " + req.response);
+            Logger.log(
+                "exception while parsing batch of messages, response is "
+                + req.response
+            );
             messages.add(ChatMessage.unk(
                 nowtime,
                 "exception while parsing batch of messages"
