@@ -18,6 +18,7 @@ public class HTTPRequest
     
     private int contentLength;
     private boolean chunked;
+    boolean unexpectedclose;
     String response;
     
     synchronized static HTTPRequest req(
@@ -26,7 +27,13 @@ public class HTTPRequest
         throws IOException
     {
         try {
-            return new HTTPRequest(path, postdata);
+            final HTTPRequest res = new HTTPRequest(path, postdata);
+            if (!res.unexpectedclose) {
+                return res;
+            }
+            Logger.log(
+                "call ended unexpected, re-opening socket and re-attempting same call"
+            );
         } catch (SocketException e) {
             Logger.log(e);
             Logger.log("socket exception, re-attempting same call");
@@ -44,6 +51,7 @@ public class HTTPRequest
         if (socket == null || socket.isClosed()) {
             Logger.log("socket is null or closed, opening a new one");
             Logger.log("keep alive: had requests x" + keepaliverequests);
+            keepaliverequests = 0;
             try {
                 socket = new Socket(PL_ADDR, 80);
                 os = socket.getOutputStream();
@@ -70,6 +78,7 @@ public class HTTPRequest
     {
         ensureSocket();
 
+        this.unexpectedclose = true;
         this.chunked = false;
         this.contentLength = -1;
 
@@ -131,8 +140,8 @@ public class HTTPRequest
         }
 
         if (this.contentLength == -1) {
-            Logger.log("no content length, closing socket");
-            socket.close();
+            Logger.log("no content length");
+            this.unexpectedclose = false;
             return;
         }
         
@@ -144,6 +153,7 @@ public class HTTPRequest
         }
         
         this.response = new String(content);
+        this.unexpectedclose = false;
     }
     
     private void readChunked() throws IOException
@@ -196,6 +206,7 @@ public class HTTPRequest
         }
 
         this.response = new String(content);
+        this.unexpectedclose = false;
     }
     
     private void readHeaderLine(@NotNull String line)
