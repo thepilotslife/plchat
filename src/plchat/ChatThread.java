@@ -5,14 +5,9 @@ import java.net.*;
 import java.util.*;
 import java.util.function.Consumer;
 
-import static plchat.Constants.*;
-
 class ChatThread extends Thread
 {
 
-    static Socket socket;
-    static InputStream is;
-    static OutputStream os;
     static String phpsess;
     
     private Consumer<ArrayList<ChatMessage>> listener;
@@ -44,23 +39,8 @@ class ChatThread extends Thread
         }
     }
     
-    private void ensureSocket()
-    {
-        if (socket == null || socket.isClosed()) {
-            System.out.println("socket is null or closed, opening a new one");
-            try {
-                socket = new Socket(PL_ADDR, 80);
-                os = socket.getOutputStream();
-                is = socket.getInputStream();
-            } catch (IOException e) {
-                Logger.log(e);
-            }
-        };
-    }
-    
     private void login() throws IOException
     {
-        ensureSocket();
         final String body = String.format(
             "form_submitted=1&form_username=%s&form_password=%s"
             + "&form_autologin=1&submit=",
@@ -68,19 +48,36 @@ class ChatThread extends Thread
             URLEncoder.encode(Main.p.getProperty("pw"), "UTF-8")
         );
         
-        new HTTPRequest("?", body);
+        HTTPRequest.req("?", body);
         if (phpsess == null) {
             Logger.log("tried to login, but did not receive a session");
         } else {
             Logger.log("logged in (probably)");
         }
     }
+
+    void send(@NotNull String message)
+    {
+        try {
+            message = URLEncoder.encode(message, "UTF-8");
+            final String path = "/assets/chat-send.php?comment=" + message;
+            HTTPRequest.req(path, null);
+        } catch (Exception e) {
+            Logger.log(e);
+            Logger.log("failed to send chat message");
+        }
+    }
     
     private void grab() throws IOException
     {
-        ensureSocket();
-        final HTTPRequest req = new HTTPRequest("/assets/chat-output.php", null);
+        final HTTPRequest req = HTTPRequest.req("/assets/chat-output.php", null);
         final String res = req.response;
+        
+        if (res == null) {
+            Logger.log("got null response while grabbing chat");
+            return;
+        }
+
         //System.out.println(res);
 
         /*
@@ -211,11 +208,6 @@ class ChatThread extends Thread
     
     void shutdown()
     {
-        if (socket != null) {
-            try {
-                socket.close();
-            } catch (IOException ignored) {}
-        }
         this.interrupt();
     }
     

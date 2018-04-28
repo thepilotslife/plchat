@@ -55,6 +55,10 @@ public class Main
                 Logger.log(e);
                 Logger.log("exception while saving chat log");
             }
+            
+            if (message.message.equals("!ping")) {
+                chat.send("pong! - hi " + message.player);
+            }
         }
     }
     
@@ -64,6 +68,7 @@ public class Main
         if (chat != null) {
             chat.shutdown();
         }
+        HTTPRequest.shutdown();
         if (chatlogger != null) {
             chatlogger.shutdown();
         }

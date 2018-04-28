@@ -1,25 +1,65 @@
 package plchat;
 
 import java.io.*;
+import java.net.*;
 
 import static java.lang.System.arraycopy;
 
+import static plchat.Constants.*;
+
 public class HTTPRequest
 {
+
+    static Socket socket;
+    static InputStream is;
+    static OutputStream os;
+    static String phpsess;
     
     private int contentLength;
     private boolean chunked;
     String response;
+    
+    synchronized static HTTPRequest req(
+        @NotNull String path,
+        @Nullable String postdata)
+        throws IOException
+    {
+        ensureSocket();
+        return new HTTPRequest(path, postdata);
+    }
+    
+    private static void ensureSocket()
+    {
+        if (socket == null || socket.isClosed()) {
+            System.out.println("socket is null or closed, opening a new one");
+            try {
+                socket = new Socket(PL_ADDR, 80);
+                os = socket.getOutputStream();
+                is = socket.getInputStream();
+            } catch (IOException e) {
+                Logger.log(e);
+            }
+        };
+    }
+    
+    static void shutdown()
+    {
+        if (socket != null) {
+            try {
+                socket.close();
+            } catch (IOException ignored) {}
+        }
+    }
 
-    HTTPRequest(@NotNull String path, @Nullable String postdata) throws IOException
+    private HTTPRequest(
+        @NotNull String path,
+        @Nullable String postdata)
+        throws IOException
     {
         this.chunked = false;
         this.contentLength = -1;
 
-        final InputStream is = ChatThread.is;
-        final OutputStream os = ChatThread.os;
-
-        if (postdata == null) {
+        if (postdata != null) {
             os.write("POST ".getBytes());
         } else {
             os.write("GET ".getBytes());
@@ -76,7 +116,7 @@ public class HTTPRequest
 
         if (this.contentLength == -1) {
             Logger.log("no content length, closing socket");
-            ChatThread.socket.close();
+            socket.close();
             return;
         }
         
@@ -92,8 +132,6 @@ public class HTTPRequest
     
     private void readChunked() throws IOException
     {
-        final InputStream is = ChatThread.is;
-
         byte[] content = new byte[0];
 
         while (true) {
