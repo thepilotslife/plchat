@@ -78,6 +78,9 @@ class ChatLogger
         
         if (this.writer != null) {
             try {
+                this.writer.write("<p><a href='./'>back</a></p>");
+            } catch (Exception e) {}
+            try {
                 this.writer.close();
             } catch (Exception e) {}
         }
@@ -88,6 +91,7 @@ class ChatLogger
         );
         
         final File logfile = new File(Main.p.getProperty("logpath"), filename);
+        final boolean existed = logfile.exists();
         
         try {
             this.writer = new FileWriter(logfile, /*append*/ true);
@@ -98,10 +102,14 @@ class ChatLogger
         }
         
         try {
-            this.writer.write(String.format(
-                "<em>*** session open: %tH:%<tM:%<tS</em><br/>",
-                Time.getCalendar().getTime()
-            ));
+            if (existed) {
+                this.writer.write(String.format(
+                    "<em>*** session open: %tH:%<tM:%<tS</em><br/>",
+                    Time.getCalendar().getTime()
+                ));
+            } else {
+                this.writer.write("<p><a href='./'>back</a></p>");
+            }
             this.writer.flush();
         } catch (IOException e) {
             Logger.log(e);
