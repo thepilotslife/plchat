@@ -14,6 +14,7 @@ public class HTTPRequest
     static InputStream is;
     static OutputStream os;
     static String phpsess;
+    static int keepaliverequests;
     
     private int contentLength;
     private boolean chunked;
@@ -24,14 +25,25 @@ public class HTTPRequest
         @Nullable String postdata)
         throws IOException
     {
-        ensureSocket();
+        try {
+            return new HTTPRequest(path, postdata);
+        } catch (SocketException e) {
+            Logger.log(e);
+            Logger.log("socket exception, re-attempting same call");
+        }
+        try {
+            socket.close();
+            socket = null;
+        } catch (Exception e) {
+        }
         return new HTTPRequest(path, postdata);
     }
     
     private static void ensureSocket()
     {
         if (socket == null || socket.isClosed()) {
-            System.out.println("socket is null or closed, opening a new one");
+            Logger.log("socket is null or closed, opening a new one");
+            Logger.log("keep alive: had requests x" + keepaliverequests);
             try {
                 socket = new Socket(PL_ADDR, 80);
                 os = socket.getOutputStream();
@@ -56,6 +68,8 @@ public class HTTPRequest
         @Nullable String postdata)
         throws IOException
     {
+        ensureSocket();
+
         this.chunked = false;
         this.contentLength = -1;
 
@@ -85,12 +99,14 @@ public class HTTPRequest
         }
         os.flush();
         
+        keepaliverequests++;
+        
         final StringBuilder sb = new StringBuilder();
         int prev = 0;
         while (true) {
             int i = is.read();
             if (i == -1) {
-                Logger.log("unexpected close");
+                Logger.log("unexpected close (headers)");
                 return;
             }
             sb.append((char) i);
@@ -139,7 +155,7 @@ public class HTTPRequest
             while (true) {
                 int i = is.read();
                 if (i == -1) {
-                    Logger.log("unexpected close");
+                    Logger.log("unexpected close (chunk)");
                 }
                 if (i == '\r') {
                     continue;
@@ -155,7 +171,7 @@ public class HTTPRequest
             Logger.log("chunksize " + chunksize);
             if (chunksize == 0) {
                 if (is.read() == -1 || is.read() == -1) {
-                    Logger.log("unexpected close");
+                    Logger.log("unexpected close (chunk 0)");
                 }
                 break;
             }
@@ -175,7 +191,7 @@ public class HTTPRequest
             content = newcontent;
             
             if (is.read() == -1 || is.read() == -1) {
-                Logger.log("unexpected close");
+                Logger.log("unexpected close (chunk end)");
             }
         }
 
