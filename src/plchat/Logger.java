@@ -5,15 +5,15 @@ import java.io.*;
 class Logger
 {
 
-    private static FileOutputStream os;
+    private static FileWriter os;
 
-    static void init() throws FileNotFoundException
+    static void init() throws IOException
     {
         final String filename = String.format(
             "log-%tY-%<tm-%<td-%<tH%<tM%<tS.txt",
             Time.calendar
         );
-        os = new FileOutputStream(filename);
+        os = new FileWriter(filename, /*append*/ true);
     }
     
     static void shutdown()
@@ -41,7 +41,7 @@ class Logger
     {
         System.out.println(s);
         try {
-            os.write(s.getBytes());
+            os.write(s);
             os.write('\n');
             os.flush();
         } catch (IOException e) {
