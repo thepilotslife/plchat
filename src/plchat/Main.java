@@ -8,6 +8,7 @@ public class Main
 
     private static ChatThread chat;
     static Properties p;
+    static ChatLogger chatlogger;
     static long lastmessage;
 
     public static void main(String[] args) throws Exception
@@ -18,12 +19,13 @@ public class Main
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("make sure file 'user.properties' exists");
-            System.out.println("  and contains keys 'name' and 'pw'");
+            System.out.println("  and contains keys 'name','pw','logpath'");
             return;
         }
 
         Logger.init();
         Runtime.getRuntime().addShutdownHook(new Thread(Main::shutdown));
+        chatlogger = new ChatLogger();
         chat = new ChatThread(Main::chatconsumer);
         chat.start();
     }
@@ -47,32 +49,12 @@ public class Main
             }
             
             lastmessage = time;
-            
-            if (message.source == ChatMessage.SRC_DIS) {
-                System.out.println(String.format(
-                    "[%tH:%<tM:%<tS] <-- %s disconnected from the server",
-                    message.time,
-                    message.player
-                ));
-                continue;
+            try {
+                chatlogger.log(message);
+            } catch (Exception e) {
+                Logger.log(e);
+                Logger.log("exception while saving chat log");
             }
-            if (message.source == ChatMessage.SRC_CON) {
-                System.out.println(String.format(
-                    "[%tH:%<tM:%<tS] --> %s connected to the server",
-                    message.time,
-                    message.player
-                ));
-                continue;
-            }
-
-            final String[] SOURCES = { "(?) ", "", "(WEB) " };
-            System.out.println(String.format(
-                "[%tH:%<tM:%<tS] %s<%s> %s",
-                message.time,
-                SOURCES[message.source],
-                message.player,
-                message.message
-            ));
         }
     }
     
@@ -81,6 +63,9 @@ public class Main
         Logger.shutdown();
         if (chat != null) {
             chat.shutdown();
+        }
+        if (chatlogger != null) {
+            chatlogger.shutdown();
         }
     }
 
