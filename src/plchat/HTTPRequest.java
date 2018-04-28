@@ -114,7 +114,7 @@ public class HTTPRequest
             
             int chunksize = Integer.parseInt(chunksizestr.toString(), 16);
             
-            Logger.log("chunksize " + chunksizestr.toString() + " " + chunksize);
+            Logger.log("chunksize " + chunksize);
             if (chunksize == 0) {
                 if (is.read() == -1 || is.read() == -1) {
                     Logger.log("unexpected close");
