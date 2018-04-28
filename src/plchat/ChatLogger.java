@@ -99,7 +99,7 @@ class ChatLogger
         
         try {
             this.writer.write(String.format(
-                "<strong>*** session start: %tH:%<tM:%<tS</strong><br/>",
+                "<em>*** session start: %tH:%<tM:%<tS</em><br/>",
                 Time.getCalendar().getTime()
             ));
             this.writer.flush();
