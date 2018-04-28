@@ -58,6 +58,27 @@ public class Main
             
             if (message.message.equals("!ping")) {
                 chat.send("pong! - hi " + message.player);
+            } else if (message.message.startsWith("!8ball")) {
+                final String[] responses = {
+                    "It is certain",
+                    "It is decidedly so",
+                    "Without a doubt",
+                    "Yes, definitely",
+                    "You may rely on it",
+                    "As I see it, yes",
+                    "Most likely",
+                    "Yes",
+                    "Sign points to yes",
+                    "Ask again later",
+                    "It's better not to know",
+                    "Cannot predict now",
+                    "Don't count on it",
+                    "My reply is no",
+                    "My sources say no",
+                    "Very doubtful"
+                };
+                final int resp = new Random().nextInt(responses.length);
+                chat.send(message.player + ": " + responses[resp]);
             }
         }
     }
