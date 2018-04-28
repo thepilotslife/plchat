@@ -2,6 +2,8 @@ package plchat;
 
 import java.io.*;
 import java.net.*;
+import java.util.*;
+import java.util.function.Consumer;
 
 import static plchat.Constants.*;
 
@@ -12,6 +14,13 @@ class ChatThread extends Thread
     static InputStream is;
     static OutputStream os;
     static String phpsess;
+    
+    private Consumer<ArrayList<ChatMessage>> listener;
+
+    ChatThread(Consumer<ArrayList<ChatMessage>> listener)
+    {
+        this.listener = listener;
+    }
 
     @Override
     public void run()
@@ -71,7 +80,133 @@ class ChatThread extends Thread
     {
         ensureSocket();
         final HTTPRequest req = new HTTPRequest("/assets/chat-output.php", null);
-        System.out.println(req.response);
+        final String res = req.response;
+        //System.out.println(res);
+
+        /*
+         * <!--blablahaydzleft
+         * -->
+         * 
+         * \t<div class="chat-mg"><a>playername</a> has connected to the server<br>
+           <span class='chat-stuff'> 5 minutes Ago</span> - <span class='chat-stuff'>
+           In-Game Chat</span></div>
+         *
+         * \t<div class="chat-msg"><a>robin_be</a> - ping<br><span class='chat-stuff'>
+           Recently Posted</span> - <span class='chat-stuff'>Website Chat</span></div>
+         */
+        
+        final Date nowtime = Time.getCalendar().getTime();
+        final ArrayList<ChatMessage> messages = new ArrayList<>();
+        boolean isend = false;
+        try {
+            int start = -1;
+            do {
+                start = res.indexOf('\t', start + 1);
+                if (start == -1) {
+                    return;
+                }
+                
+                int end = res.indexOf('\t', start + 1);
+                if (end == -1) {
+                    isend = true;
+                    end = res.length();
+                }
+                
+                start += 26; // "<div class='chat-msg'><a>".length();
+                String msg = res.substring(start, end);
+                
+                try {
+                    final ChatMessage message = parseMessage(msg, nowtime);
+                    if (message != null) {
+                        messages.add(message);
+                    }
+                } catch (Exception e) {
+                    Logger.log(e);
+                    Logger.log("exception while parsing single message");
+                    messages.add(ChatMessage.unk(
+                        nowtime,
+                        "exception while parsing single message"
+                    ));
+                }
+            } while (!isend);
+        } catch (Exception e) {
+            Logger.log(e);
+            Logger.log("exception while parsing batch of messages");
+            messages.add(ChatMessage.unk(
+                nowtime,
+                "exception while parsing batch of messages"
+            ));
+        }
+        
+        listener.accept(messages);
+    }
+    
+    @Nullable
+    private ChatMessage parseMessage(@NotNull String msg, @NotNull Date nowtime)
+    {
+        int idx;
+        
+        idx = msg.indexOf("</a>");
+        if (idx == -1) {
+            return ChatMessage.unk(nowtime, "couldn't find username end");
+        }
+        
+        final String player = msg.substring(0, idx);
+        final int msgstartindex = idx + 4; // "</a>".length();
+
+        int end = msg.lastIndexOf("</span></div>");
+        if (end == -1) {
+            return ChatMessage.unk(nowtime, "couldn't find message end");
+        }
+        
+        idx = msg.lastIndexOf('>', end - 1);
+        if (idx == -1) {
+            return ChatMessage.unk(nowtime, "couldn't find source start");
+        }
+        
+        final String sourcestr = msg.substring(idx + 1, end);
+        int source = ChatMessage.SRC_UNK;
+        if ("In-Game Chat".equals(sourcestr)) {
+            source = ChatMessage.SRC_IGN;
+        } else if ("Website Chat".equals(sourcestr)) {
+            source = ChatMessage.SRC_WEB;
+        }
+        
+        end = idx - 35; // "</span> - <span class='chat-stuff'>".length();
+        idx = msg.lastIndexOf('>', end - 1);
+        if (idx == -1) {
+            return ChatMessage.unk(nowtime, "couldn't find time start");
+        }
+        
+        Date time = nowtime;
+        final String timestr = msg.substring(idx + 1, end + 1);
+        if (timestr.endsWith("Seconds Ago")) {
+            int seconds = 0;
+            try {
+                seconds = Integer.parseInt(timestr.substring(0, timestr.indexOf(' ')));
+            } catch (Exception e) {
+                Logger.log("could not get time for '" + timestr + "'");
+            }
+            if (seconds != 0) {
+                final Calendar c = Time.getCalendar();
+                c.add(Calendar.SECOND, -seconds);
+                nowtime = c.getTime();
+            }
+        } else if (!"Recently Posted".equals(timestr)) {
+            final String skipmsg = "skipping old message: " + timestr;
+            return new ChatMessage(time, "-", skipmsg, source);
+        }
+        
+        end = idx - 28; // "<br><span class='chat-stuff'>".length();
+        final String message = msg.substring(msgstartindex, end);
+        
+        if (message.startsWith(" has connected")) {
+            source = ChatMessage.SRC_CON;
+        } else if (message.startsWith(" has disconnected")) {
+            source = ChatMessage.SRC_DIS;
+        }
+
+        return new ChatMessage(time, player, message.substring(3), source);
     }
     
     void shutdown()
