@@ -89,6 +89,7 @@ public class Main
     
     static void shutdown()
     {
+        Logger.log("shutdownhook");
         Logger.shutdown();
         if (chat != null) {
             chat.shutdown();

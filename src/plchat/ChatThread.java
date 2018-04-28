@@ -102,15 +102,27 @@ class ChatThread extends Thread
                 if (start == -1) {
                     return;
                 }
+                start += 26; // "<div class='chat-msg'><a>".length();
                 
                 int end = res.indexOf('\t', start + 1);
+                while (end < start && end != -1) {
+                    end = res.indexOf('\t', end + 1);
+                }
                 if (end == -1) {
                     isend = true;
                     end = res.length();
                 }
                 
-                start += 26; // "<div class='chat-msg'><a>".length();
+                if (end - start < 10) {
+                    continue;
+                }
+
                 String msg = res.substring(start, end);
+                
+                if (msg.contains("color: #33AA33;")) {
+                    // airline chat
+                    continue;
+                }
                 
                 try {
                     final ChatMessage message = parseMessage(msg, nowtime);
@@ -128,7 +140,7 @@ class ChatThread extends Thread
             } while (!isend);
         } catch (Exception e) {
             Logger.log(e);
-            Logger.log("exception while parsing batch of messages");
+            Logger.log("exception while parsing batch of messages, response is " + req.response);
             messages.add(ChatMessage.unk(
                 nowtime,
                 "exception while parsing batch of messages"
