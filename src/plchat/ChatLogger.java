@@ -99,7 +99,7 @@ class ChatLogger
         
         try {
             this.writer.write(String.format(
-                "<em>*** session start: %tH:%<tM:%<tS</em><br/>",
+                "<em>*** session open: %tH:%<tM:%<tS</em><br/>",
                 Time.getCalendar().getTime()
             ));
             this.writer.flush();
@@ -112,6 +112,13 @@ class ChatLogger
     void shutdown()
     {
         if (this.writer != null) {
+            try {
+                this.writer.write(String.format(
+                    "<em>*** session close: %tH:%<tM:%<tS</em><br/>",
+                    Time.getCalendar().getTime()
+                ));
+                this.writer.flush();
+            } catch (Exception e) {}
             try {
                 this.writer.close();
             } catch (Exception e) {
