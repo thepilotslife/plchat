@@ -40,6 +40,8 @@ public class Main
             lastmessage = messages.get(messages.size() - 1).time.getTime();
         }
         
+        long batchlastmessage = lastmessage;
+        
         final ListIterator<ChatMessage> iter = messages.listIterator(messages.size());
         while (iter.hasPrevious()) {
             final ChatMessage message = iter.previous();
@@ -48,7 +50,7 @@ public class Main
                 continue;
             }
             
-            lastmessage = time;
+            batchlastmessage = time;
             try {
                 chatlogger.log(message);
             } catch (Exception e) {
@@ -81,6 +83,8 @@ public class Main
                 chat.send(message.player + ": " + responses[resp]);
             }
         }
+        
+        lastmessage = batchlastmessage;
     }
     
     static void shutdown()
