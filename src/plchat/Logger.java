@@ -11,7 +11,7 @@ class Logger
     {
         final String filename = String.format(
             "log-%tY-%<tm-%<td-%<tH%<tM%<tS.txt",
-            Time.calendar
+            Time.getCalendar()
         );
         os = new FileWriter(filename, /*append*/ true);
     }
@@ -39,6 +39,11 @@ class Logger
     
     static void log(@NotNull String s)
     {
+        s = String.format(
+            "[%td-%<tm-%<tH:%<tM:%<tS] %s",
+            Time.getCalendar(),
+            s
+        );
         System.out.println(s);
         try {
             os.write(s);
