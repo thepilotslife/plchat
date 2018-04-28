@@ -13,7 +13,8 @@ class Logger
             "log-%tY-%<tm-%<td-%<tH%<tM%<tS.txt",
             Time.getCalendar()
         );
-        os = new FileWriter(filename, /*append*/ true);
+        final File file = new File(Main.p.getProperty("logpath"), filename);
+        os = new FileWriter(file, /*append*/ true);
     }
     
     static void shutdown()
