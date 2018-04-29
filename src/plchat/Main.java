@@ -80,7 +80,8 @@ public class Main
     {
         if ("!cmds".equals(command)) {
             chat.send(
-                "- !ping !8ball !player !score !cash !groups !assets !cars !houses"
+                "- !ping !8ball !player !score !cash !groups !assets !cars !houses "
+                + "!licenses"
             );
             return;
         }
@@ -225,6 +226,43 @@ public class Main
                     );
                 }
                 chat.send(result);
+            }
+            return;
+        }
+
+        if ("!licenses".equals(command)) {
+            final PlayerData data = playerCommand("licenses", params);
+
+            if (data != null) {
+                final String PRE_0 = " a license for ";
+                final String PRE_1 = ", ";
+                String pre = PRE_0;
+                final StringBuilder sb = new StringBuilder();
+                sb.append(data.name).append(" has ");
+                if (data.shamalLicense) {
+                    sb.append(pre);
+                    pre = PRE_1;
+                    sb.append("shamal");
+                }
+                if (data.dodoLicense) {
+                    sb.append(pre);
+                    pre = PRE_1;
+                    sb.append("dodo");
+                }
+                if (data.maverickLicense) {
+                    sb.append(pre);
+                    pre = PRE_1;
+                    sb.append("maverick");
+                }
+                if (data.nevadaLicense) {
+                    sb.append(pre);
+                    pre = PRE_1;
+                    sb.append("nevada");
+                }
+                if (!PRE_1.equals(pre)) {
+                    sb.append("no licenses!");
+                }
+                chat.send(sb.toString());
             }
             return;
         }

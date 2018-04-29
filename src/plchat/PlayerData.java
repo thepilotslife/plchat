@@ -62,7 +62,7 @@ public class PlayerData
             case "Shamal License": pd.shamalLicense = "Yes".equals(parts[i + 1]); break;
             case "Dodo License": pd.dodoLicense = "Yes".equals(parts[i + 1]); break;
             case "Maverick License":
-                pd.maverickLicense = "yes".equals(parts[i + 1]); break;
+                pd.maverickLicense = "Yes".equals(parts[i + 1]); break;
             case "Shamal Missions:": pd.share("shamal", parts[i + 1]); break;
             case "Rescue Missions:": pd.share("rescue", parts[i + 1]); break;
             case "Cargo Missions:": pd.share("cargo", parts[i + 1]); break;
