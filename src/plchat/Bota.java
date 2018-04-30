@@ -52,10 +52,15 @@ public class Bota
             switch (p) {
             case "2nd":
             case "3rd":
-                sb.append(", ");
+                sb.append("{ffffff}, ");
             case "1st":
-                sb.append(parts[i + 3]);
-                sb.append(" {ff9900}").append(parts[i + 5]).append("{ffffff} $");
+                String name = parts[i + 3];
+                final int idx = name.indexOf(' ');
+                if (idx != -1) {
+                    name = name.substring(0, idx);
+                }
+                sb.append(name);
+                sb.append(" ").append(parts[i + 5]).append(" {33AA33}$");
                 sb.append(Main.formatMoney(Integer.parseInt(parts[i + 7]) / 1000));
                 sb.append("K");
             }
