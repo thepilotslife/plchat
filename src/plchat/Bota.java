@@ -41,7 +41,7 @@ public class Bota
         response = response.substring(0, startidx);
         response = TAGPAT.matcher(response).replaceAll("§");
         response = TOKENPAT.matcher(response).replaceAll("§");
-        System.out.println(response);
+        //System.out.println(response);
         final String[] parts = response.split("§");
         
         final StringBuilder sb = new StringBuilder();
