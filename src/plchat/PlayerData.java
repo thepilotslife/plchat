@@ -170,6 +170,7 @@ public class PlayerData
                 this.nameThree = this.nameTwo;
                 this.shareTwo = share;
                 this.nameTwo = name;
+                return;
             }
             if (share > this.shareThree) {
                 this.shareThree = share;
