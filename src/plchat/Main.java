@@ -101,6 +101,14 @@ public class Main
             return;
         }
         
+        if ("!botainfo".equals(command)) {
+            chat.send(
+                "Apr30-Jun2 $.5M and cape/member + $5M for airline + airline slot "
+                + "(money wins)"
+            );
+            return;
+        }
+        
         if ("!8ball".equals(command)) {
             final String[] responses = {
                 "It is certain",
