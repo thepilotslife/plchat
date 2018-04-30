@@ -66,7 +66,7 @@ public class Main
             
             if (message.message.startsWith("!")) {
                 final String parts[] = message.message.split(" ");
-                handleCommand(message, parts[0], parts);
+                handleCommand(message, parts[0].toLowerCase(), parts);
             }
         }
         
@@ -88,6 +88,16 @@ public class Main
 
         if ("!ping".equals(command)) {
             chat.send("{ff00ff}pong! - hi " + message.player);
+            return;
+        }
+        
+        if ("!bota".equals(command)) {
+            final String bota = Bota.get();
+            if (bota == null) {
+                chat.send("could not get BOTA data");
+                return;
+            }
+            chat.send(bota);
             return;
         }
         
