@@ -90,6 +90,14 @@ class ChatThread extends Thread
          *
          * \t<div class="chat-msg"><a>robin_be</a> - ping<br><span class='chat-stuff'>
            Recently Posted</span> - <span class='chat-stuff'>Website Chat</span></div>
+         *
+         * \t <div class="chat-msg"><b style="color: #FF9900;">(Admin Chat)</b> <a>
+         * usr</a> - Msg<br><span class='chat-stuff'>23 Seconds Ago</span> - <span
+         *  class='char-stuff'>In-Game Chat</span></div>
+         * 
+         * \t\t\t\t\t<div class="chat-msg"> <b style="color: #33AA33;"> (American
+         *  Airlines)</b> <a>user</a> - Msg<br><span class='chat-stuff'>3 Seconds
+         * Ago</span> - <span class='chat-stuff'>In-Game Chat</span></div>
          */
         
         final Date nowtime = Time.getCalendar().getTime();
@@ -119,6 +127,11 @@ class ChatThread extends Thread
 
                 String msg = res.substring(start, end);
                 
+                if (msg.contains("color: #FF9900;") || msg.contains("(Admin Chat)")) {
+                    // admin chat
+                    continue;
+                }
+
                 if (msg.contains("color: #33AA33;")) {
                     // airline chat
                     continue;
