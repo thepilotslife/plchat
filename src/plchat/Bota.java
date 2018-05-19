@@ -44,16 +44,16 @@ public class Bota
         //System.out.println(response);
         final String[] parts = response.split("§");
         
-        final StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder("JetStar xxxx {33AA33}$X,XXXK");
         int i = -1;
         for (String p : parts) {
             i++;
             
             switch (p) {
             case "2nd":
-            case "3rd":
-                sb.append("{ffffff}, ");
+            //case "3rd":
             case "1st":
+                sb.append("{ffffff}, ");
                 String name = parts[i + 3];
                 final int idx = name.indexOf(' ');
                 if (idx != -1) {
