@@ -331,6 +331,9 @@ public class Main
         String before = String.valueOf(value);
         
         while (before.length() > 3) {
+            if (before.length() == 4 && before.charAt(0) == '-') {
+                break;
+            }
             after = "," + before.substring(before.length() - 3) + after;
             before = before.substring(0, before.length() - 3);
         }
