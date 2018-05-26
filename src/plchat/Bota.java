@@ -44,31 +44,70 @@ public class Bota
         //System.out.println(response);
         final String[] parts = response.split("§");
         
-        final StringBuilder sb = new StringBuilder("JetStar xxxx {33AA33}$X,XXXK");
-        int i = -1;
-        for (String p : parts) {
-            i++;
-            
-            switch (p) {
-            case "2nd":
-            //case "3rd":
-            case "1st":
-                sb.append("{ffffff}, ");
-                String name = parts[i + 3];
-                final int idx = name.indexOf(' ');
-                if (idx != -1) {
-                    name = name.substring(0, idx);
-                }
-                sb.append(name);
-                sb.append(" ").append(parts[i + 5]).append(" {33AA33}$");
-                sb.append(Main.formatMoney(Integer.parseInt(parts[i + 7]) / 1000));
-                sb.append("K");
+        final String[] names = new String[9];
+        final int[] amounts = new int[9];
+        final int[] flights = new int[9];
+        
+        int i = 9;
+        while (true) {
+            // this does not work if there are > 9 airlines
+            if (i > parts.length || parts[i].length() != 3) {
+                break;
             }
+
+            final int nth = parts[i].charAt(0) - '1';
+            if (nth < 0 || 8 < nth) {
+                break;
+            }
+
+            String name = parts[i + 3];
+            final int idx = name.indexOf(' ');
+            if (idx != -1) {
+                name = name.substring(0, idx);
+            }
+            names[nth] = name;
+            amounts[nth] = Integer.parseInt(parts[i + 7]);
+            flights[nth] = Integer.parseInt(parts[i + 5]);
+
+            if ("Jetstar".equals(name)) {
+                flights[nth] += 5108;
+                amounts[nth] += 7676999;
+                for (int a = 0; a < nth; a++) {
+                    if (amounts[a] < amounts[nth]) {
+                        int _f = flights[nth];
+                        int _a = amounts[nth];
+                        for (int b = nth; b > a; b--) {
+                            names[b] = names[b - 1];
+                            amounts[b] = amounts[b - 1];
+                            flights[b] = flights[b - 1];
+                        }
+                        flights[a] = _f;
+                        amounts[a] = _a;
+                        names[a] = "Jetstar";
+                        break;
+                    }
+                }
+            }
+            
+            i += 13;
         }
+        
+        final StringBuilder sb = new StringBuilder();
+        for (i = 0; i < 3; i++) {
+            if (i > 0) {
+                sb.append("{ffffff} ");
+            }
+            sb.append(names[i]);
+            sb.append(" ").append(flights[i]);
+            sb.append(" {33AA33}").append(Main.formatMoney(amounts[i] / 1000));
+            sb.append("K");
+        }
+
         if (sb.length() == 0) {
             return null;
         }
-        return sb.toString();
+
+        return " ~" + sb.toString();
     }
     
     public static void main(String[] args) throws Exception {
