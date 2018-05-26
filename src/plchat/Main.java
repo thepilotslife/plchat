@@ -81,7 +81,7 @@ public class Main
         if ("!cmds".equals(command)) {
             chat.send(
                 "- !ping !8ball !player !score !cash !groups !assets !cars !houses "
-                + "!licenses"
+                + "!licenses !roll"
             );
             return;
         }
@@ -110,6 +110,20 @@ public class Main
                 "Apr30-Jun2 $.5M and cape/member + $5M for airline + airline slot "
                 + "(money wins)"
             );
+            return;
+        }
+        
+        if ("!roll".equals(command)) {
+            int max = 100;
+            if (params.length > 1) {
+                try {
+                    max = Integer.parseInt(params[1]);
+                    if (max < 2) {
+                        max = 2;
+                    }
+                } catch (Exception e) {}
+            }
+            chat.send(message.player + " rolls " + (new Random()).nextInt(max));
             return;
         }
         
