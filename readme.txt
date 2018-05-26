@@ -3,4 +3,4 @@ webchat (which echo's from the game chat) and respond to
 commands.  Also saves chatlogs.
 
 Chatlogs captured by the currently running instance are saved
-at https://robin.thisisgaming.org/pl/stats/
+at https://robin.thisisgaming.org/pl/logs/
