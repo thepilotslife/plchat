@@ -81,7 +81,7 @@ public class Main
         if ("!cmds".equals(command)) {
             chat.send(
                 "- !ping !8ball !player !score !cash !groups !assets !cars !houses "
-                + "!licenses !roll"
+                + "!licenses !roll !interest"
             );
             return;
         }
@@ -110,6 +110,44 @@ public class Main
                 "Apr30-Jun2 $.5M and cape/member + $5M for airline + airline slot "
                 + "(money wins)"
             );
+            return;
+        }
+
+        if ("!interest".equals(command)) {
+            if (params.length > 1) {
+                try {
+                    final int value = Integer.parseInt(params[1]);
+                    final int interest = (int) (value * 0.000125f);
+                    final String msg = String.format(
+                        "$%s will generate about $%s every 60 minutes",
+                        formatMoney(value),
+                        formatMoney(interest)
+                    );
+                    chat.send(msg);
+                    return;
+                } catch (Exception e) {
+                }
+            }
+            chat.send("syntax: !interest [amount]");
+            return;
+        }
+
+        if ("!rinterest".equals(command)) {
+            if (params.length > 1) {
+                try {
+                    final int interest = Integer.parseInt(params[1]);
+                    final int value = (int) (interest / 0.000125f);
+                    final String msg = String.format(
+                        "to get $%s of interest you need about $%s",
+                        formatMoney(interest),
+                        formatMoney(value)
+                    );
+                    chat.send(msg);
+                    return;
+                } catch (Exception e) {
+                }
+            }
+            chat.send("syntax: !rinterest [amount]");
             return;
         }
         
