@@ -97,10 +97,6 @@ public class Main
                 chat.send("could not get BOTA data");
                 return;
             }
-            if (bota.length() > 120) {
-                chat.send(bota.substring(0, 120));
-                return;
-            }
             chat.send(bota);
             return;
         }
