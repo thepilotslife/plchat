@@ -81,7 +81,7 @@ public class Main
         if ("!cmds".equals(command)) {
             chat.send(
                 "- !ping !8ball !player !score !cash !groups !assets !cars !houses "
-                + "!licenses !roll !interest"
+                + "!licenses !roll !interest !rinterest"
             );
             return;
         }
@@ -186,7 +186,7 @@ public class Main
         }
         
         if ("!player".equals(command)) {
-            final PlayerData data = playerCommand("player", params);
+            final PlayerData data = playerCommand("player", message.player, params);
 
             if (data != null) {
                 chat.send(String.format(
@@ -200,7 +200,7 @@ public class Main
         }
         
         if ("!score".equals(command)) {
-            final PlayerData data = playerCommand("score", params);
+            final PlayerData data = playerCommand("score", message.player, params);
 
             if (data != null) {
                 chat.send(String.format(
@@ -220,7 +220,7 @@ public class Main
         }
 
         if ("!cash".equals(command)) {
-            final PlayerData data = playerCommand("cash", params);
+            final PlayerData data = playerCommand("cash", message.player, params);
 
             if (data != null) {
                 chat.send(String.format(
@@ -233,7 +233,7 @@ public class Main
         }
 
         if ("!groups".equals(command)) {
-            final PlayerData data = playerCommand("groups", params);
+            final PlayerData data = playerCommand("groups", message.player, params);
 
             if (data != null) {
                 chat.send(String.format(
@@ -247,7 +247,7 @@ public class Main
         }
 
         if ("!assets".equals(command)) {
-            final PlayerData data = playerCommand("assets", params);
+            final PlayerData data = playerCommand("assets", message.player, params);
 
             if (data != null) {
                 chat.send(String.format(
@@ -266,7 +266,7 @@ public class Main
         }
 
         if ("!cars".equals(command)) {
-            final PlayerData data = playerCommand("cars", params);
+            final PlayerData data = playerCommand("cars", message.player, params);
 
             if (data != null) {
                 String result = data.name + " has:";
@@ -279,7 +279,7 @@ public class Main
         }
 
         if ("!houses".equals(command)) {
-            final PlayerData data = playerCommand("houses", params);
+            final PlayerData data = playerCommand("houses", message.player, params);
 
             if (data != null) {
                 if (data.houses.isEmpty()) {
@@ -301,7 +301,7 @@ public class Main
         }
 
         if ("!licenses".equals(command)) {
-            final PlayerData data = playerCommand("licenses", params);
+            final PlayerData data = playerCommand("licenses", message.player, params);
 
             if (data != null) {
                 final String PRE_0 = " a license for ";
@@ -341,11 +341,13 @@ public class Main
     @Nullable
     private static PlayerData playerCommand(
         @NotNull String command,
+        @NotNull String player,
         @NotNull String[] params)
     {
        if (params.length < 2) {
-           chat.send("syntax: !" + command + " [playername]");
-           return null;
+           //chat.send("syntax: !" + command + " [playername]");
+           //return null;
+           return getPlayerData(player);
        }
        
        return getPlayerData(params[1]);
