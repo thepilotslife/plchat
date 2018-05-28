@@ -179,6 +179,11 @@ class ChatThread extends Thread
             return ChatMessage.unk(nowtime, "couldn't find username end");
         }
         
+        int tidx = msg.indexOf("<a>");
+        if (tidx != -1 && tidx < idx) {
+            msg = msg.substring(tidx + 3);
+        }
+        
         final String player = msg.substring(0, idx);
         final int msgstartindex = idx + 4; // "</a>".length();
 
