@@ -154,10 +154,10 @@ public class Main
         }
         
         if ("!roll".equals(command)) {
-            int max = 100;
+            int max = 101;
             if (params.length > 1) {
                 try {
-                    max = Integer.parseInt(params[1]);
+                    max = Integer.parseInt(params[1]) + 1;
                     if (max < 2) {
                         max = 2;
                     }
