@@ -131,10 +131,16 @@ public class Main
         if ("!rinterest".equals(command)) {
             if (params.length > 1) {
                 try {
-                    final int interest = Integer.parseInt(params[1]);
+                    int interest = Integer.parseInt(params[1]);
+                    String m = "";
+                    if (interest > 268434) {
+                        interest = 268434;
+                        m = "(overflow) ";
+                    }
                     final int value = (int) (interest / 0.000125f);
                     final String msg = String.format(
-                        "to get $%s of interest you need about $%s",
+                        "%sto get $%s of interest you need about $%s",
+                        m,
                         formatMoney(interest),
                         formatMoney(value)
                     );
