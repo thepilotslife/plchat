@@ -92,6 +92,8 @@ public class Main
         }
         
         if ("!bota".equals(command)) {
+            chat.send("BOTA is over, gz Jetstar, IA, AA and everyone else");
+            /*
             final String bota = Bota.get();
             if (bota == null) {
                 chat.send("could not get BOTA data");
@@ -99,6 +101,7 @@ public class Main
             }
             chat.send(bota);
             return;
+            */
         }
         
         if ("!botainfo".equals(command)) {
