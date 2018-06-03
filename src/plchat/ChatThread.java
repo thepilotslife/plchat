@@ -113,6 +113,11 @@ class ChatThread extends Thread
                 if (start == -1) {
                     return;
                 }
+                
+                if (res.charAt(start + 1) != '<') {
+                    continue;
+                }
+
                 start += 26; // "<div class='chat-msg'><a>".length();
                 
                 int end = res.indexOf('\t', start + 1);
@@ -177,11 +182,6 @@ class ChatThread extends Thread
         idx = msg.indexOf("</a>");
         if (idx == -1) {
             return ChatMessage.unk(nowtime, "couldn't find username end");
-        }
-        
-        int tidx = msg.indexOf("<a>");
-        if (tidx != -1 && tidx < idx) {
-            msg = msg.substring(tidx + 3);
         }
         
         final String player = msg.substring(0, idx);
