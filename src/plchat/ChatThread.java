@@ -181,7 +181,8 @@ class ChatThread extends Thread
         
         idx = msg.indexOf("</a>");
         if (idx == -1) {
-            return ChatMessage.unk(nowtime, "couldn't find username end");
+            return null;
+            //return ChatMessage.unk(nowtime, "couldn't find username end");
         }
         
         final String player = msg.substring(0, idx);
