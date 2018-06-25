@@ -1,0 +1,59 @@
+Hello all
+
+I decided to make a chatbot (kinda like Chappie) for fun and [s]profit[/s] to easier find info about players.
+
+It also records chat logs, which can be found here: [url=https://robin.thisisgaming.org/pl/logs/]https://robin.thisisgaming.org/pl/logs/[/url] (log timestamps are CET/CEST: GMT+1 or GMT+2 (DST applies)).
+I might add a IRC bridge too, but I feel like I may be the only one that would use that.
+
+commands: [font=courier]!cmds !ping !8ball !player !score !cash !groups !assets !cars !houses !licenses !roll !interest !rinterest[/font]
+[list]
+[li][b]!8ball[/b] classic 8ball
+[quote]
+[17:32:36] <Naldo> !8ball Is Computer Science a awesome degree?
+[17:32:39] (WEB) <robin_be> Naldo: Yes, definitely
+[/quote][/li]
+[li][b]!player[/b] shows a player's score and last online time
+[quote]
+[23:02:30] <robin_be> !player Naldo
+[23:02:33] (WEB) <robin_be> player Naldo: 10959 score, last seen Online Now
+[/quote][/li]
+[li][b]!score[/b] shows a player's score and top 3 most popular mission type
+[quote]
+[23:03:18] <robin_be> !score Naldo
+[23:03:21] (WEB) <robin_be> player Naldo: 10959 score, 9899 missions: 24'/. cargo drop - 18'/. helicopter - 14'/. trucking[/quote][/li]
+[li][b]!cash[/b] shows a player's cash in hands
+[quote]
+[23:03:23] <robin_be> !cash Naldo
+[23:03:26] (WEB) <robin_be> Naldo has $27,237 in hand[/quote][/li]
+[li][b]!groups[/b] shows the airline and company a player is part of
+[quote]
+[23:03:01] <robin_be> !groups Naldo
+[23:03:04] (WEB) <robin_be> Naldo is in airline Jetstar Airways and company Star Inc.[/quote][/li]
+[li][b]!assets[/b] shows a player's assets (cars + houses) and values
+[quote]
+[01:13:24] <robin_be> !assets robin_be
+[01:13:27] (WEB) <robin_be> robin_be has 8 car(s) ($8,400,000) and 2 house(s) ($40,500,000 - 20 slots) for a total of $48,900,000[/quote][/li]
+[li][b]!cars[/b] shows the cars a player owns
+[quote][23:07:31] <Naldo> !cars Aaron
+[23:07:34] (WEB) <robin_be> Aaron has: Infernus RC Bandit Seasparrow RC Baron Blista Compact RC Goblin RC Goblin AT-400 Phoenix[/quote][/li]
+[li][b]!houses[/b] shows the houses a player owns
+[quote][01:27:03] <robin_be> !houses robin_be
+[01:27:07] (WEB) <robin_be> North Pole: $35,000,000 15 slots Los Santos Sewers: $5,500,000 5 slots
+[/quote][/li]
+[li][b]!licenses[/b] shows the licenses a player has
+[quote][20:28:16] <robin_be> !licenses robin_be
+[20:28:19] (WEB) <robin_be> robin_be has a license for shamal, dodo, maverick, nevada[/quote][/li]
+[li][b]!roll[/b] get a random number
+[quote][20:28:16] <robin_be> !roll gimme number
+[20:28:19] (WEB) <robin_be> robin_be rolls 69[/quote]
+[quote][16:33:06] <TheBestGamerEver> !roll 10
+[16:33:09] (WEB) <robin_be> TheBestGamerEver rolls 4[/quote][/li]
+[li][b]!interest[/b] shows the interest you'll get for some amount of money
+[quote][21:54:01] <Redirect> !interest 600000
+[21:54:04] (WEB) <robin_be> $600,000 will generate about $75 every 60 minutes[/quote][/li]
+[li][b]!rinterest[/b] shows how much money you need to get this amount of interest
+[quote][22:30:14] <robin_be> !rinterest 5000
+[22:30:17] (WEB) <robin_be> to get $5,000 of interest you need about $40,000,000[/quote][/li]
+[/list]
+
+
