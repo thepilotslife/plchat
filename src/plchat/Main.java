@@ -321,7 +321,7 @@ public class Main
             final PlayerData data = playerCommand("licenses", message.player, params);
 
             if (data != null) {
-                final String PRE_0 = " a license for ";
+                final String PRE_0 = "a license for ";
                 final String PRE_1 = ", ";
                 String pre = PRE_0;
                 final StringBuilder sb = new StringBuilder();
