@@ -87,7 +87,15 @@ public class Main
         }
 
         if ("!ping".equals(command)) {
-            chat.send("{ff00ff}pong! - hi " + message.player);
+            Random r = new Random();
+            char[] color = { '{', '0', '0', '0', '0', '0', '0', '}' };
+            char[] v = {
+                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+            };
+            for (int i = 1; i < 7; i++) {
+                color[i] = v[r.nextInt(v.length)];
+            }
+            chat.send(new String(color) + "pong! - hi " + message.player);
             return;
         }
         
