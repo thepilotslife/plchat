@@ -48,7 +48,7 @@ class ChatThread extends Thread
             URLEncoder.encode(Main.p.getProperty("pw"), "UTF-8")
         );
         
-        HTTPRequest.req("?", body);
+        HTTPRequest.req("/?", body);
         if (phpsess == null) {
             Logger.log("tried to login, but did not receive a session");
         } else {

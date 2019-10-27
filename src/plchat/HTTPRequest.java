@@ -2,15 +2,21 @@ package plchat;
 
 import java.io.*;
 import java.net.*;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import static java.lang.System.arraycopy;
-
-import static plchat.Constants.*;
 
 public class HTTPRequest
 {
 
-    static Socket socket;
+    static SSLSocket socket;
     static InputStream is;
     static OutputStream os;
     static String phpsess;
@@ -53,10 +59,28 @@ public class HTTPRequest
             Logger.log("keep alive: had requests x" + keepaliverequests);
             keepaliverequests = 0;
             try {
-                socket = new Socket(PL_ADDR, 80);
+                //socket = new Socket(PL_ADDR, 443);
+                final SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
+                sslContext.init(null, new TrustManager[] {
+                    new X509TrustManager() {
+                        @Override
+                        public void checkClientTrusted(X509Certificate[] chain, String authType) {
+                        }
+                        @Override
+                        public void checkServerTrusted(X509Certificate[] chain, String authType) {
+                        }
+                        @Override
+                        public X509Certificate[] getAcceptedIssuers() {
+                            return new X509Certificate[0];
+                        }
+                    },
+                }, new SecureRandom());
+                SSLSocketFactory sf = sslContext.getSocketFactory();
+                socket = (SSLSocket) sf.createSocket("94.16.120.182", 443);
                 os = socket.getOutputStream();
                 is = socket.getInputStream();
-            } catch (IOException e) {
+                socket.setKeepAlive(true);
+            } catch (Exception e) {
                 Logger.log(e);
             }
         };

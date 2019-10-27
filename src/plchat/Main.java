@@ -124,7 +124,7 @@ public class Main
             if (params.length > 1) {
                 try {
                     final int value = Integer.parseInt(params[1]);
-                    final int interest = (int) (value * 0.000125f);
+                    final int interest = (int) (value / 1500f);
                     final String msg = String.format(
                         "$%s will generate about $%s every 60 minutes",
                         formatMoney(value),
@@ -148,7 +148,7 @@ public class Main
                         interest = 268434;
                         m = "(overflow) ";
                     }
-                    final int value = (int) (interest / 0.000125f);
+                    final int value = interest * 1500;
                     final String msg = String.format(
                         "%sto get $%s of interest you need about $%s",
                         m,
