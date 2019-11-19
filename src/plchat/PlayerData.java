@@ -69,7 +69,8 @@ public class PlayerData
             case "Helicopter Missions:": pd.share("helicopter", parts[i + 1]); break;
             case "AT400 Missions:": pd.share("at400", parts[i + 1]); break;
             case "Dodo Missions:": pd.share("dodo", parts[i + 1]); break;
-            case "Military Missions:": pd.share("military", parts[i + 1]); break;
+            // Military is misspelled on the site...
+            case "Miltary Missions:": pd.share("military", parts[i + 1]); break;
             case "Cargo Drop:": pd.share("cargo drop", parts[i + 1]); break;
             case "Skimmer Missions:": pd.share("skimmer", parts[i + 1]); break;
             case "Trucking Missions:": pd.share("trucking", parts[i + 1]); break;
