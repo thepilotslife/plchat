@@ -81,7 +81,7 @@ public class Main
         if ("!cmds".equals(command)) {
             chat.send(
                 "- !ping !8ball !player !score !cash !groups !assets !cars !houses "
-                + "!licenses !roll !interest !rinterest"
+                + "!licenses !roll !interest !rinterest !missions"
             );
             return;
         }
