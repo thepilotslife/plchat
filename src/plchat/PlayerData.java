@@ -119,6 +119,7 @@ public class PlayerData
     int totalCarCost;
     ArrayList<House> houses = new ArrayList<>();
     ArrayList<Car> cars = new ArrayList<>();
+    HashMap<String, Integer> missions = new HashMap<>();
     
     static class House {
         String location;
@@ -157,6 +158,7 @@ public class PlayerData
             String[] parts = sharestr.split(" ");
             String shareperc = parts[4].substring(0, parts[4].length() - 1);
             int share = Integer.parseInt(shareperc);
+            missions.put(name, Integer.valueOf(parts[0]));
             if (share > this.shareOne) {
                 this.shareThree = this.shareTwo;
                 this.nameThree = this.nameTwo;

@@ -236,6 +236,40 @@ public class Main
             return;
         }
 
+        if ("!missions".equals(command)) {
+            if (params.length > 1) {
+                String player = message.player;
+                int typestart = 1;
+                if (params.length > 2) {
+                    player = params[1];
+                    typestart = 2;
+                }
+                PlayerData p = getPlayerData(player);
+                StringBuilder s = new StringBuilder(player).append(":");
+                Integer cd = p.missions.get("cargo drop");
+                if (cd != null) {
+                    p.missions.put("cargodrop", cd);
+                    p.missions.remove("cargo drop");
+                }
+                for (; typestart < params.length; typestart++) {
+                    Integer value = p.missions.get(params[typestart]);
+                    if (value == null) {
+                        s.setLength(0);
+                        for (String type : p.missions.keySet()) {
+                            s.append('/').append(type);
+                        }
+                        if (s.length() > 0) {
+                            chat.send(s.substring(1));
+                        }
+                        return;
+                    }
+                    s.append(' ').append(value.intValue()).append(" ").append(params[typestart]);
+                }
+                chat.send(s.toString());
+            }
+            return;
+        }
+
         if ("!cash".equals(command)) {
             final PlayerData data = playerCommand("cash", message.player, params);
 
