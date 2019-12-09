@@ -245,27 +245,29 @@ public class Main
                     typestart = 2;
                 }
                 PlayerData p = getPlayerData(player);
-                StringBuilder s = new StringBuilder(player).append(":");
-                Integer cd = p.missions.get("cargo drop");
-                if (cd != null) {
-                    p.missions.put("cargodrop", cd);
-                    p.missions.remove("cargo drop");
-                }
-                for (; typestart < params.length; typestart++) {
-                    Integer value = p.missions.get(params[typestart]);
-                    if (value == null) {
-                        s.setLength(0);
-                        for (String type : p.missions.keySet()) {
-                            s.append('/').append(type);
-                        }
-                        if (s.length() > 0) {
-                            chat.send(s.substring(1));
-                        }
-                        return;
+                if (p != null) {
+                    StringBuilder s = new StringBuilder(player).append(":");
+                    Integer cd = p.missions.get("cargo drop");
+                    if (cd != null) {
+                        p.missions.put("cargodrop", cd);
+                        p.missions.remove("cargo drop");
                     }
-                    s.append(' ').append(value.intValue()).append(" ").append(params[typestart]);
+                    for (; typestart < params.length; typestart++) {
+                        Integer value = p.missions.get(params[typestart]);
+                        if (value == null) {
+                            s.setLength(0);
+                            for (String type : p.missions.keySet()) {
+                                s.append('/').append(type);
+                            }
+                            if (s.length() > 0) {
+                                chat.send(s.substring(1));
+                            }
+                            return;
+                        }
+                        s.append(' ').append(value.intValue()).append(" ").append(params[typestart]);
+                    }
+                    chat.send(s.toString());
                 }
-                chat.send(s.toString());
             }
             return;
         }
