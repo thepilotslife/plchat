@@ -98,6 +98,11 @@ public class Main
             chat.send(new String(color) + "pong! - hi " + message.player);
             return;
         }
+
+        if ("!keepalive".equals(command)) {
+            chat.send("" + HTTPRequest.keepaliverequests);
+            return;
+        }
         
         if ("!bota".equals(command)) {
             chat.send("BOTA is over, gz Jetstar, IA, AA and everyone else");
