@@ -116,6 +116,16 @@ public class Main
             return;
             */
         }
+
+        if ("!botc".equals(command)) {
+            final String botc = Botc.get();
+            if (botc == null) {
+                chat.send("could not get BOTC data");
+            } else {
+                chat.send(botc);
+            }
+            return;
+        }
         
         if ("!botainfo".equals(command)) {
             chat.send(

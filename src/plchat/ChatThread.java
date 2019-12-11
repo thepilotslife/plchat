@@ -39,7 +39,7 @@ class ChatThread extends Thread
         }
     }
     
-    private void login() throws IOException
+    public static void login() throws IOException
     {
         final String body = String.format(
             "form_submitted=1&form_username=%s&form_password=%s"
