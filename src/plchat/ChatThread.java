@@ -11,6 +11,7 @@ class ChatThread extends Thread
     static String phpsess;
     
     private Consumer<ArrayList<ChatMessage>> listener;
+    private long lastbotc = System.currentTimeMillis();
 
     ChatThread(Consumer<ArrayList<ChatMessage>> listener)
     {
@@ -24,6 +25,7 @@ class ChatThread extends Thread
             if (phpsess == null) {
                 try {
                     login();
+                    this.send("I'm up");
                 } catch (IOException e) {
                     Logger.log(e);
                 }
@@ -33,6 +35,18 @@ class ChatThread extends Thread
             } catch (IOException e) {
                 Logger.log(e);
             }
+
+            long time = System.currentTimeMillis();
+            if (time - lastbotc > 600_000) {
+                lastbotc = time;
+                final String botc = Botc.get();
+                if (botc == null) {
+                    this.send("could not get BOTC data");
+                } else {
+                    this.send(botc);
+                }
+            }
+
             try {
                 Thread.sleep(2500);
             } catch (InterruptedException ignored) {}

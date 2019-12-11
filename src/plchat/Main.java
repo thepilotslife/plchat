@@ -464,6 +464,7 @@ public class Main
         Logger.log("shutdownhook");
         Logger.shutdown();
         if (chat != null) {
+            chat.send("I'm going down");
             chat.shutdown();
         }
         HTTPRequest.shutdown();
