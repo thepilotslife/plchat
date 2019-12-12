@@ -118,7 +118,17 @@ public class Main
         }
 
         if ("!botc".equals(command)) {
-            final String botc = Botc.get();
+            final String botc = Botc.get(0);
+            if (botc == null) {
+                chat.send("could not get BOTC data");
+            } else {
+                chat.send(botc);
+            }
+            return;
+        }
+
+        if ("!botcrip".equals(command)) {
+            final String botc = Botc.get(1);
             if (botc == null) {
                 chat.send("could not get BOTC data");
             } else {

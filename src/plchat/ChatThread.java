@@ -39,7 +39,7 @@ class ChatThread extends Thread
             long time = System.currentTimeMillis();
             if (time - lastbotc > 600_000) {
                 lastbotc = time;
-                final String botc = Botc.get();
+                final String botc = Botc.get(0);
                 if (botc == null) {
                     this.send("could not get BOTC data");
                 } else {

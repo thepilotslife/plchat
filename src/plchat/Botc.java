@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
@@ -48,7 +47,7 @@ public class Botc
     }
 
     @Nullable
-    static String get()
+    static String get(int type)
     {
         if (os == null) {
             final File file = new File(Main.p.getProperty("logpath"), "botc.txt");
@@ -59,7 +58,7 @@ public class Botc
             }
         }
         try {
-            return parse(HTTPRequest.req("/Groups/Companies", null).response);
+            return parse(HTTPRequest.req("/Groups/Companies", null).response, type);
         } catch (Exception e) {
             Logger.log(e);
             Logger.log("couldn't get bota info");
@@ -68,7 +67,7 @@ public class Botc
     }
     
     @Nullable
-    private static String parse(@NotNull String response)
+    private static String parse(@NotNull String response, int type)
     {
         int startidx = response.indexOf(
             "<h1 class=\"content-header\">Active Companies</h1>"
@@ -111,7 +110,7 @@ public class Botc
                     try {
                         String n = parts[i + 1];
                         String name = namemap.get(n);
-                        if (name != null) {
+                        if (name != null && !"SnR".equals(name)) {
                             Comp c = new Comp();
                             c.name = name;
                             c.hauls = Integer.parseInt(parts[i + 2]) - scoremap.get(n).intValue();
@@ -135,8 +134,27 @@ public class Botc
         comps.sort(Botc::compareComp);
 
         StringBuilder sb = new StringBuilder();
-        for (Comp c : comps) {
-            sb.append(", ").append(c.hauls).append(' ').append(c.name);
+        if (type == 0) {
+            for (Comp c : comps) {
+                sb.append(", ").append(c.hauls).append(' ').append(c.name);
+            }
+        } else if (type == 1) {
+            int j = 0;
+            int score = 0;
+            for (int i = comps.size() - 1; i >= 0; i--) {
+                Comp c = comps.get(i);
+                j++;
+                if (j == 4) {
+                    score = c.hauls;
+                }
+                if (j > 4 && c.hauls > score) {
+                    break;
+                }
+                sb.append(", ").append(c.hauls).append(' ').append(c.name);
+            }
+            if (sb.length() > 0) {
+                sb.insert(2, "{ff0000}rip: ");
+            }
         }
 
         if (sb.length() == 0) {
@@ -153,7 +171,7 @@ public class Botc
     public static void main(String[] args) throws Exception {
         Main.init();
         ChatThread.login();
-        System.out.println(get());
+        System.out.println(get(1));
     }
 
     static class Comp
