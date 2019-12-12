@@ -110,7 +110,7 @@ public class Botc
                     try {
                         String n = parts[i + 1];
                         String name = namemap.get(n);
-                        if (name != null && !"SnR".equals(name)) {
+                        if (name != null) {
                             Comp c = new Comp();
                             c.name = name;
                             c.hauls = Integer.parseInt(parts[i + 2]) - scoremap.get(n).intValue();
@@ -132,6 +132,13 @@ public class Botc
             Logger.log(e);
         }
         comps.sort(Botc::compareComp);
+
+        for (Comp c : comps) {
+            if ("SnR".equals(c.name)) {
+                comps.remove(c);
+                break;
+            }
+        }
 
         StringBuilder sb = new StringBuilder();
         if (type == 0) {
