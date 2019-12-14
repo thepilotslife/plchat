@@ -11,6 +11,68 @@ public class Main
     static ChatLogger chatlogger;
     static long lastmessage;
     static HashMap<String, PlayerData> pd = new HashMap<>();
+    static int[] irank = {
+        0,
+        10,
+        30,
+        70,
+        140,
+        280,
+        500,
+        800,
+        1200,
+        1800,
+        2500,
+        3500,
+        4000,
+        4500,
+        4800,
+        5000,
+        5400,
+        5800,
+        6100,
+        6500,
+        7000,
+        8000,
+        9000,
+        10000,
+        11000,
+        12000,
+        13000,
+        16000,
+        18000,
+    };
+    static String[] srank = {
+        "Trainee Pilot",
+        "Corporal Pilot",
+        "Pilot Sergeant",
+        "Staff Pilot Sergeant",
+        "Sergeant Pilot",
+        "Master Flight Sergeant",
+        "First Flight Sergeant",
+        "Senior Flight Officer",
+        "Sergeant Fighter",
+        "Lieutenant",
+        "Senior Captain",
+        "Pilot Major",
+        "Lieutenant Pilot Major",
+        "Master Pilot",
+        "Major Flight General",
+        "Flight Officer",
+        "Flight Commander",
+        "First Officer",
+        "Captain",
+        "Senior Captain",
+        "Commercial First Officer",
+        "Commercial Captain",
+        "Commercial Senior Captain",
+        "PL First Officer",
+        "PL Captain",
+        "PL Senior Commander",
+        "PL Commander",
+        "PL Senior Captain",
+        "Aviation Legend",
+    };
 
     public static void main(String[] args) throws Exception
     {
@@ -80,8 +142,8 @@ public class Main
     {
         if ("!cmds".equals(command)) {
             chat.send(
-                "- !ping !8ball !player !score !cash !groups !assets !cars !houses "
-                + "!licenses !roll !interest !rinterest !missions"
+                "- ping 8ball player score cash groups assets cars houses "
+                + "licenses roll (r)interest rank missions"
             );
             return;
         }
@@ -411,6 +473,40 @@ public class Main
                     sb.append("no licenses!");
                 }
                 chat.send(sb.toString());
+            }
+            return;
+        }
+
+        if ("!rank".equals(command)) {
+            StringBuilder sb = new StringBuilder();
+            String scorestr;
+            try {
+                Integer.parseInt(scorestr = params[1]);
+            } catch (Exception e) {
+                final PlayerData data = playerCommand("rank", message.player, params);
+                if (data == null) {
+                    return;
+                }
+                sb.append(data.name).append('(').append(data.score).append(") rank: ");
+                scorestr = data.score;
+            }
+            try {
+                int score = Integer.parseInt(scorestr);
+                for (int i = irank.length - 1; i >= 0; i--) {
+                    if (score >= irank[i]) {
+                        sb.append(srank[i]).append('(').append(irank[i]).append(')');
+                        if (i < irank.length - 1) {
+                            sb.append(" next: ");
+                            sb.append(srank[i + 1]).append('(').append(irank[i + 1]).append(')');
+                            sb.append(" (+").append(irank[i + 1] - score).append(')');
+                        }
+                        chat.send(sb.toString());
+                        return;
+                    }
+                }
+                chat.send("idk, negative score or something?");
+            } catch (Exception e) {
+                chat.send("IT BROKE! " + e.toString());
             }
             return;
         }
