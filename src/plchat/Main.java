@@ -179,16 +179,20 @@ public class Main
             */
         }
 
-        if ("!botc".equals(command)) {
+        if (command.startsWith("!botc")) {
+            /*
             final String botc = Botc.get(0);
             if (botc == null) {
                 chat.send("could not get BOTC data");
             } else {
                 chat.send(botc);
             }
+            */
+            chat.send("it's over, check forums");
             return;
         }
 
+        /*
         if ("!botcrip".equals(command)) {
             final String botc = Botc.get(1);
             if (botc == null) {
@@ -198,6 +202,7 @@ public class Main
             }
             return;
         }
+        */
         
         if ("!botainfo".equals(command)) {
             chat.send(

@@ -11,7 +11,9 @@ class ChatThread extends Thread
     static String phpsess;
     
     private Consumer<ArrayList<ChatMessage>> listener;
+    /*
     private long lastbotc = System.currentTimeMillis();
+    */
 
     ChatThread(Consumer<ArrayList<ChatMessage>> listener)
     {
@@ -36,6 +38,7 @@ class ChatThread extends Thread
                 Logger.log(e);
             }
 
+            /*
             long time = System.currentTimeMillis();
             if (time - lastbotc > 600_000) {
                 lastbotc = time;
@@ -46,6 +49,7 @@ class ChatThread extends Thread
                     this.send(botc);
                 }
             }
+            */
 
             try {
                 Thread.sleep(2500);
