@@ -1,6 +1,11 @@
 package plchat;
 
 import java.io.FileInputStream;
+import java.io.InterruptedIOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.util.*;
 
 public class Main
@@ -74,9 +79,68 @@ public class Main
         "Aviation Legend",
     };
 
+    static final InetAddress ADDR_LOCAL;
+
+    static
+    {
+        InetAddress addr = null;
+        try {
+            addr = Inet4Address.getByAddress(new byte[] { 127, 0, 0, 1 });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        ADDR_LOCAL = addr;
+    }
+
+    private static DatagramSocket sockin, sockout;
+    private static RecvThread recvthread;
+
+    private static class RecvThread extends Thread
+    {
+        @Override
+        public void run()
+        {
+            byte buf[] = new byte[200];
+            for (;;) {
+                DatagramPacket packet = new DatagramPacket(buf, buf.length);
+                try {
+                    sockin.receive(packet);
+                    if (packet.getAddress().isLoopbackAddress()) {
+                        chat.send(new String(buf, 0, packet.getLength()));
+                    }
+                } catch (InterruptedIOException e) {
+                    return;
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    static void send_to_irc(String msg)
+    {
+        if (sockout != null) {
+            try {
+                byte[] m = msg.getBytes();
+                sockout.send(new DatagramPacket(m, m.length, ADDR_LOCAL, 5056));
+            } catch (Exception e) {
+                Logger.log(e);
+            }
+        }
+    }
+
     public static void main(String[] args) throws Exception
     {
         init();
+
+        try {
+            sockout = new DatagramSocket();
+            sockin = new DatagramSocket(5055);
+            recvthread = new RecvThread();
+            recvthread.start();
+        } catch (Exception e) {
+        }
+
         Runtime.getRuntime().addShutdownHook(new Thread(Main::shutdown));
         chatlogger = new ChatLogger();
         chat = new ChatThread(Main::chatconsumer);
@@ -121,6 +185,13 @@ public class Main
             batchlastmessage = time;
             try {
                 chatlogger.log(message);
+                if (message.source == ChatMessage.SRC_CON) {
+                    send_to_irc("> connected: " + message.player);
+                } else if (message.source == ChatMessage.SRC_DIS) {
+                    send_to_irc("> disconnected: " + message.player);
+                } else {
+                    send_to_irc("> " + message.player + ": " + message.message);
+                }
             } catch (Exception e) {
                 Logger.log(e);
                 Logger.log("exception while saving chat log");
@@ -573,6 +644,19 @@ public class Main
     static void shutdown()
     {
         Logger.log("shutdownhook");
+        if (recvthread != null && recvthread.isAlive()) {
+            recvthread.interrupt();
+        }
+        if (sockin != null) {
+            try {
+                sockin.close();
+            } catch (Throwable t) {}
+        }
+        if (sockout != null) {
+            try {
+                sockout.close();
+            } catch (Throwable t) {}
+        }
         Logger.shutdown();
         if (chat != null) {
             chat.send("I'm going down");
