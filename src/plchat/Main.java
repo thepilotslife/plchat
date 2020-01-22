@@ -1,11 +1,13 @@
 package plchat;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.*;
 
 public class Main
@@ -101,18 +103,31 @@ public class Main
         public void run()
         {
             byte buf[] = new byte[200];
-            for (;;) {
-                DatagramPacket packet = new DatagramPacket(buf, buf.length);
-                try {
-                    sockin.receive(packet);
-                    if (packet.getAddress().isLoopbackAddress()) {
-                        chat.send(new String(buf, 0, packet.getLength()));
+            try {
+                for (;;) {
+                    try (DatagramSocket sockin = new DatagramSocket(5055)) {
+                        Main.sockin = sockin;
+                        for (;;) {
+                            DatagramPacket pckt;
+                            pckt = new DatagramPacket(buf, buf.length);
+                            sockin.receive(pckt);
+                            if (pckt.getAddress().isLoopbackAddress()) {
+                                chat.send(new String(buf, 0, pckt.getLength()));
+                            }
+                        }
+                    } catch (SocketException e) {
+                        if (this.isInterrupted()) {
+                            return;
+                        }
+                        Logger.log("plchat socket closed, restarting it");
+                    } catch (InterruptedIOException e) {
+                        return;
+                    } catch (IOException e) {
+                        Logger.log("plchat socket closed, restarting it");
                     }
-                } catch (InterruptedIOException e) {
-                    return;
-                } catch (Throwable e) {
-                    e.printStackTrace();
+                    Thread.sleep(3000);
                 }
+            } catch (InterruptedException e) {
             }
         }
     }
@@ -135,7 +150,6 @@ public class Main
 
         try {
             sockout = new DatagramSocket();
-            sockin = new DatagramSocket(5055);
             recvthread = new RecvThread();
             recvthread.start();
         } catch (Exception e) {
