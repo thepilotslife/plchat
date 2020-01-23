@@ -200,11 +200,17 @@ public class Main
             try {
                 chatlogger.log(message);
                 if (message.source == ChatMessage.SRC_CON) {
-                    send_to_irc("> connected: " + message.player);
+                    send_to_irc("[-->] connected: " + message.player);
                 } else if (message.source == ChatMessage.SRC_DIS) {
-                    send_to_irc("> disconnected: " + message.player);
+                    send_to_irc("[<--] disconnected: " + message.player);
+                } else if (message.source == ChatMessage.SRC_WEB) {
+                    String playa = message.player;
+                    if ("robin_be".equals(playa)) {
+                        playa = "Zrobin_be"; // prevent nickalerts for my own bot
+                    }
+                    send_to_irc("[WEB] " + playa + ": " + message.message);
                 } else {
-                    send_to_irc("> " + message.player + ": " + message.message);
+                    send_to_irc("[ IG] " + message.player + ": " + message.message);
                 }
             } catch (Exception e) {
                 Logger.log(e);
