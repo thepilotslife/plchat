@@ -80,6 +80,7 @@ class ChatThread extends Thread
             if (message.length() > 110) {
                 message = message.substring(0, 108) + "(..)";
             }
+            message = message.replace('%', '#');
             message = URLEncoder.encode(message, "UTF-8");
             final String path = "/assets/chat-send.php?comment=" + message;
             HTTPRequest.req(path, null);
