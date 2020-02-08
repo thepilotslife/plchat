@@ -258,7 +258,7 @@ public class Main
         }
         
         if ("!bota".equals(command)) {
-            long t = 1582415941 - System.currentTimeMillis();
+            long t = 1582415941000L - System.currentTimeMillis();
             long h = t / 1000 / 3600;
             long d = h / 24;
             h = h - d * 24;

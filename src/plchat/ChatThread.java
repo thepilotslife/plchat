@@ -53,7 +53,7 @@ class ChatThread extends Thread
             */
 
             long time = System.currentTimeMillis();
-            if (time - lastbota > 600_000 && time < 1582415941) {
+            if (time - lastbota > 600_000 && time < 1582415941000L) {
                 lastbota = time;
                 Bota.get();
             }
