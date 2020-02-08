@@ -258,7 +258,11 @@ public class Main
         }
         
         if ("!bota".equals(command)) {
-            chat.send("BOTA is over, gz Jetstar, IA, AA and everyone else");
+            long t = 1582415941 - System.currentTimeMillis();
+            long h = t / 1000 / 3600;
+            long d = h / 24;
+            h = h - d * 24;
+            chat.send("ends in " + d + "d" + h + "h");
             /*
             final String bota = Bota.get();
             if (bota == null) {
@@ -294,14 +298,6 @@ public class Main
             return;
         }
         */
-        
-        if ("!botainfo".equals(command)) {
-            chat.send(
-                "Apr30-Jun2 $.5M and cape/member + $5M for airline + airline slot "
-                + "(money wins)"
-            );
-            return;
-        }
 
         if ("!interest".equals(command)) {
             if (params.length > 1) {
