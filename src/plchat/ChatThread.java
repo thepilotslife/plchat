@@ -14,6 +14,7 @@ class ChatThread extends Thread
     /*
     private long lastbotc = System.currentTimeMillis();
     */
+    private long lastbota = System.currentTimeMillis();
 
     ChatThread(Consumer<ArrayList<ChatMessage>> listener)
     {
@@ -50,6 +51,12 @@ class ChatThread extends Thread
                 }
             }
             */
+
+            long time = System.currentTimeMillis();
+            if (time - lastbota > 600_000 && time < 1582415941) {
+                lastbota = time;
+                Bota.get();
+            }
 
             try {
                 Thread.sleep(2500);
