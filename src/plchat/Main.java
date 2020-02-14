@@ -60,7 +60,7 @@ public class Main
         "Senior Flight Officer",
         "Sergeant Fighter",
         "Lieutenant",
-        "Senior Captain",
+        "Junior Captain",
         "Pilot Major",
         "Lieutenant Pilot Major",
         "Master Pilot",
