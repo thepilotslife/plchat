@@ -29,6 +29,7 @@ class ChatThread extends Thread
                 try {
                     login();
                     this.send("I'm up");
+                    Main.send_to_irc("relay is up");
                 } catch (IOException e) {
                     Logger.log(e);
                 }

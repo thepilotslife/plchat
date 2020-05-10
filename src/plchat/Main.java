@@ -8,7 +8,9 @@ import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.Consumer;
 
 public class Main
 {
@@ -112,7 +114,19 @@ public class Main
                             pckt = new DatagramPacket(buf, buf.length);
                             sockin.receive(pckt);
                             if (pckt.getAddress().isLoopbackAddress()) {
-                                chat.send(new String(buf, 0, pckt.getLength()));
+                                if (buf[0] == '!') {
+                                    String p;
+                                    String m;
+                                    ChatMessage msg;
+                                    int plen = buf[1];
+                                    int mlen = buf[2];
+                                    p = new String(buf, 3, plen, StandardCharsets.UTF_8);
+                                    m = new String(buf, 3 + plen, mlen, StandardCharsets.UTF_8);
+                                    msg = new ChatMessage(new Date(), p, m, ChatMessage.SRC_WEB);
+                                    handleCommand(msg, Main::send_to_irc);
+                                } else {
+                                    chat.send(new String(buf, 0, pckt.getLength()));
+                                }
                             }
                         }
                     } catch (SocketException e) {
@@ -218,21 +232,20 @@ public class Main
             }
             
             if (message.message.startsWith("!")) {
-                final String parts[] = message.message.split(" ");
-                handleCommand(message, parts[0].toLowerCase(), parts);
+                handleCommand(message, chat::send);
             }
         }
         
         lastmessage = batchlastmessage;
     }
     
-    private static void handleCommand(
-        @NotNull ChatMessage message,
-        @NotNull String command,
-        @NotNull String[] params)
+    private static void handleCommand(@NotNull ChatMessage message, Consumer<String> consumer)
     {
+        final String params[] = message.message.split(" ");
+        String command = params[0].toLowerCase();
+
         if ("!cmds".equals(command)) {
-            chat.send(
+            consumer.accept(
                 "- ping 8ball player score cash groups assets cars houses "
                 + "licenses roll (r)interest rank missions"
             );
@@ -248,42 +261,42 @@ public class Main
             for (int i = 1; i < 7; i++) {
                 color[i] = v[r.nextInt(v.length)];
             }
-            chat.send(new String(color) + "pong! - hi " + message.player);
+            consumer.accept(new String(color) + "pong! - hi " + message.player);
             return;
         }
 
         if ("!keepalive".equals(command)) {
-            chat.send("" + HTTPRequest.keepaliverequests);
+            consumer.accept("" + HTTPRequest.keepaliverequests);
             return;
         }
         
+        /*
         if ("!bota".equals(command)) {
             long t = 1582415941000L - System.currentTimeMillis();
             long h = t / 1000 / 3600;
             long d = h / 24;
             h = h - d * 24;
-            chat.send("ends in " + d + "d" + h + "h");
-            /*
-            final String bota = Bota.get();
-            if (bota == null) {
-                chat.send("could not get BOTA data");
-                return;
-            }
-            chat.send(bota);
-            return;
-            */
+            consumer.accept("ends in " + d + "d" + h + "h");
+            //final String bota = Bota.get();
+            //if (bota == null) {
+            //    consumer.accept("could not get BOTA data");
+            //    return;
+            //}
+            //consumer.accept(bota);
+            //return;
         }
+        */
 
         if (command.startsWith("!botc")) {
             /*
             final String botc = Botc.get(0);
             if (botc == null) {
-                chat.send("could not get BOTC data");
+                consumer.accept("could not get BOTC data");
             } else {
-                chat.send(botc);
+                consumer.accept(botc);
             }
             */
-            chat.send("it's over, check forums");
+            consumer.accept("it's over, check forums");
             return;
         }
 
@@ -291,9 +304,9 @@ public class Main
         if ("!botcrip".equals(command)) {
             final String botc = Botc.get(1);
             if (botc == null) {
-                chat.send("could not get BOTC data");
+                consumer.accept("could not get BOTC data");
             } else {
-                chat.send(botc);
+                consumer.accept(botc);
             }
             return;
         }
@@ -309,12 +322,12 @@ public class Main
                         formatMoney(value),
                         formatMoney(interest)
                     );
-                    chat.send(msg);
+                    consumer.accept(msg);
                     return;
                 } catch (Exception e) {
                 }
             }
-            chat.send("syntax: !interest [amount]");
+            consumer.accept("syntax: !interest [amount]");
             return;
         }
 
@@ -334,12 +347,12 @@ public class Main
                         formatMoney(interest),
                         formatMoney(value)
                     );
-                    chat.send(msg);
+                    consumer.accept(msg);
                     return;
                 } catch (Exception e) {
                 }
             }
-            chat.send("syntax: !rinterest [amount]");
+            consumer.accept("syntax: !rinterest [amount]");
             return;
         }
         
@@ -353,7 +366,7 @@ public class Main
                     }
                 } catch (Exception e) {}
             }
-            chat.send(message.player + " rolls " + (new Random()).nextInt(max));
+            consumer.accept(message.player + " rolls " + (new Random()).nextInt(max));
             return;
         }
         
@@ -377,15 +390,15 @@ public class Main
                 "Very doubtful"
             };
             final int resp = new Random().nextInt(responses.length);
-            chat.send(message.player + ": " + responses[resp]);
+            consumer.accept(message.player + ": " + responses[resp]);
             return;
         }
         
         if ("!player".equals(command)) {
-            final PlayerData data = playerCommand("player", message.player, params);
+            final PlayerData data = playerCommand("player", message.player, params, consumer);
 
             if (data != null) {
-                chat.send(String.format(
+                consumer.accept(String.format(
                     "player %s: %s score, last seen %s",
                     data.name,
                     data.score,
@@ -396,10 +409,10 @@ public class Main
         }
         
         if ("!score".equals(command)) {
-            final PlayerData data = playerCommand("score", message.player, params);
+            final PlayerData data = playerCommand("score", message.player, params, consumer);
 
             if (data != null) {
-                chat.send(String.format(
+                consumer.accept(String.format(
                     "player %s: %s score, %d missions: %d'/. %s - %d'/. %s - %d'/. %s",
                     data.name,
                     data.score,
@@ -423,7 +436,7 @@ public class Main
                     player = params[1];
                     typestart = 2;
                 }
-                PlayerData p = getPlayerData(player);
+                PlayerData p = getPlayerData(player, consumer);
                 if (p != null) {
                     StringBuilder s = new StringBuilder(player).append(":");
                     Integer cd = p.missions.get("cargo drop");
@@ -439,23 +452,23 @@ public class Main
                                 s.append('/').append(type);
                             }
                             if (s.length() > 0) {
-                                chat.send(s.substring(1));
+                                consumer.accept(s.substring(1));
                             }
                             return;
                         }
                         s.append(' ').append(value.intValue()).append(" ").append(params[typestart]);
                     }
-                    chat.send(s.toString());
+                    consumer.accept(s.toString());
                 }
             }
             return;
         }
 
         if ("!cash".equals(command)) {
-            final PlayerData data = playerCommand("cash", message.player, params);
+            final PlayerData data = playerCommand("cash", message.player, params, consumer);
 
             if (data != null) {
-                chat.send(String.format(
+                consumer.accept(String.format(
                     "%s has $%s in hand",
                     data.name,
                     formatMoney(data.money)
@@ -465,10 +478,10 @@ public class Main
         }
 
         if ("!groups".equals(command)) {
-            final PlayerData data = playerCommand("groups", message.player, params);
+            final PlayerData data = playerCommand("groups", message.player, params, consumer);
 
             if (data != null) {
-                chat.send(String.format(
+                consumer.accept(String.format(
                     "%s is in airline %s and company %s",
                     data.name,
                     data.airline == null ? "(none)" : data.airline,
@@ -479,10 +492,10 @@ public class Main
         }
 
         if ("!assets".equals(command)) {
-            final PlayerData data = playerCommand("assets", message.player, params);
+            final PlayerData data = playerCommand("assets", message.player, params, consumer);
 
             if (data != null) {
-                chat.send(String.format(
+                consumer.accept(String.format(
                     "%s has %d car(s) ($%s) and %d house(s) ($%s - %d slots) "
                     + "for a total of $%s",
                     data.name,
@@ -498,24 +511,24 @@ public class Main
         }
 
         if ("!cars".equals(command)) {
-            final PlayerData data = playerCommand("cars", message.player, params);
+            final PlayerData data = playerCommand("cars", message.player, params, consumer);
 
             if (data != null) {
                 String result = data.name + " has:";
                 for (PlayerData.Car car : data.cars) {
                     result += " " + car.name;
                 }
-                chat.send(result);
+                consumer.accept(result);
             }
             return;
         }
 
         if ("!houses".equals(command)) {
-            final PlayerData data = playerCommand("houses", message.player, params);
+            final PlayerData data = playerCommand("houses", message.player, params, consumer);
 
             if (data != null) {
                 if (data.houses.isEmpty()) {
-                    chat.send(data.name + " does not own any houses!");
+                    consumer.accept(data.name + " does not own any houses!");
                     return;
                 }
                 String result = "";
@@ -527,13 +540,13 @@ public class Main
                         house.slots
                     );
                 }
-                chat.send(result);
+                consumer.accept(result);
             }
             return;
         }
 
         if ("!licenses".equals(command)) {
-            final PlayerData data = playerCommand("licenses", message.player, params);
+            final PlayerData data = playerCommand("licenses", message.player, params, consumer);
 
             if (data != null) {
                 final String PRE_0 = "a license for ";
@@ -564,7 +577,7 @@ public class Main
                 if (!PRE_1.equals(pre)) {
                     sb.append("no licenses!");
                 }
-                chat.send(sb.toString());
+                consumer.accept(sb.toString());
             }
             return;
         }
@@ -575,7 +588,7 @@ public class Main
             try {
                 Integer.parseInt(scorestr = params[1]);
             } catch (Exception e) {
-                final PlayerData data = playerCommand("rank", message.player, params);
+                final PlayerData data = playerCommand("rank", message.player, params, consumer);
                 if (data == null) {
                     return;
                 }
@@ -592,13 +605,13 @@ public class Main
                             sb.append(srank[i + 1]).append('(').append(irank[i + 1]).append(')');
                             sb.append(" (+").append(irank[i + 1] - score).append(')');
                         }
-                        chat.send(sb.toString());
+                        consumer.accept(sb.toString());
                         return;
                     }
                 }
-                chat.send("idk, negative score or something?");
+                consumer.accept("idk, negative score or something?");
             } catch (Exception e) {
-                chat.send("IT BROKE! " + e.toString());
+                consumer.accept("IT BROKE! " + e.toString());
             }
             return;
         }
@@ -608,19 +621,20 @@ public class Main
     private static PlayerData playerCommand(
         @NotNull String command,
         @NotNull String player,
-        @NotNull String[] params)
+        @NotNull String[] params,
+        @NotNull Consumer<String> consumer)
     {
        if (params.length < 2) {
-           //chat.send("syntax: !" + command + " [playername]");
+           //consumer.accept("syntax: !" + command + " [playername]");
            //return null;
-           return getPlayerData(player);
+           return getPlayerData(player, consumer);
        }
        
-       return getPlayerData(params[1]);
+       return getPlayerData(params[1], consumer);
     }
     
     @Nullable
-    private static PlayerData getPlayerData(@NotNull String player)
+    private static PlayerData getPlayerData(@NotNull String player, Consumer<String> consumer)
     {
        PlayerData data = pd.get(player);
        if (data != null &&
@@ -631,7 +645,7 @@ public class Main
        if (data == null) {
            data = PlayerData.forName(player);
            if (data == null) {
-               chat.send("could not get data for player " + player);
+               consumer.accept("could not get data for player " + player);
                return null;
            }
            data.name = player;
@@ -675,6 +689,7 @@ public class Main
         }
         Logger.shutdown();
         if (chat != null) {
+            Main.send_to_irc("relay is going down");
             chat.send("I'm going down");
             chat.shutdown();
         }
