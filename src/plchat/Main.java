@@ -1,6 +1,7 @@
 package plchat;
 
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.DatagramPacket;
@@ -83,6 +84,7 @@ public class Main
         "Aviation Legend",
     };
 
+    static final String propfile = "user.properties";
     static final InetAddress ADDR_LOCAL;
 
     static
@@ -178,7 +180,7 @@ public class Main
     static void init() throws Exception
     {
         p = new Properties();
-        try (FileInputStream is = new FileInputStream("user.properties")) {
+        try (FileInputStream is = new FileInputStream(propfile)) {
             p.load(is);
         } catch (Exception e) {
             e.printStackTrace();
@@ -188,6 +190,17 @@ public class Main
         }
 
         Logger.init();
+    }
+    
+    static String saveprops()
+    {
+        try (FileWriter os = new FileWriter(propfile)) {
+            p.store(os, "comment");
+            return "saved";
+        } catch (Exception e) {
+            System.err.println("failed to write props: " + e.getMessage());
+            return "failed to save";
+        }
     }
     
     static void chatconsumer(@NotNull ArrayList<ChatMessage> messages)
@@ -267,6 +280,20 @@ public class Main
 
         if ("!keepalive".equals(command)) {
             consumer.accept("" + HTTPRequest.keepaliverequests);
+            return;
+        }
+        
+        if ("!plhud".equals(command)) {
+            if (params.length > 1 && "robin_be".equals(message.player)) {
+                p.setProperty("plhud", params[1]);
+                consumer.accept(saveprops());
+            } else {
+                String plhud = p.getProperty("plhud");
+                if (plhud == null) {
+                    plhud = "IT'S NOT SET CALL ROBIN AAAAAAAA";
+                }
+                consumer.accept(plhud);
+            }
             return;
         }
         
