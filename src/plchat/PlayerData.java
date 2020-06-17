@@ -157,7 +157,10 @@ public class PlayerData
         try {
             String[] parts = sharestr.split(" ");
             String shareperc = parts[4].substring(0, parts[4].length() - 1);
-            int share = Integer.parseInt(shareperc);
+            int share = 0;
+            if (!"NAN".equalsIgnoreCase(shareperc)) {
+                share = Integer.parseInt(shareperc);
+            }
             missions.put(name, Integer.valueOf(parts[0]));
             if (share > this.shareOne) {
                 this.shareThree = this.shareTwo;
