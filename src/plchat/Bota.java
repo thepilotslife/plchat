@@ -44,7 +44,11 @@ public class Bota
             }
         }
         try {
-            return parse(HTTPRequest.req("/Groups/", null).response);
+            HTTPRequest req = HTTPRequest.req("/Groups/", null);
+            if (req == null) {
+                return null;
+            }
+            return parse(req.response);
         } catch (Exception e) {
             Logger.log(e);
             Logger.log("couldn't get bota info");

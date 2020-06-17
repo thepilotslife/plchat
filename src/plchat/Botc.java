@@ -58,7 +58,11 @@ public class Botc
             }
         }
         try {
-            return parse(HTTPRequest.req("/Groups/Companies", null).response, type);
+            HTTPRequest req = HTTPRequest.req("/Groups/Companies", null);
+            if (req == null) {
+                return null;
+            }
+            return parse(req.response, type);
         } catch (Exception e) {
             Logger.log(e);
             Logger.log("couldn't get bota info");

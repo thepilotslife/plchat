@@ -18,12 +18,15 @@ public class PlayerData
                 "/account/"
                 + URLEncoder.encode(name, "UTF-8")
                 + "/statistics/";
-            return parse(HTTPRequest.req(url, null).response);
+            HTTPRequest req = HTTPRequest.req(url, null);
+            if (req != null) {
+                return parse(req.response);
+            }
         } catch (Exception e) {
             Logger.log(e);
             Logger.log("couldn't get player info for " + name);
-            return null;
         }
+        return null;
     }
     
     @Nullable

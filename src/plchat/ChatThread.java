@@ -34,11 +34,7 @@ class ChatThread extends Thread
                     Logger.log(e);
                 }
             }
-            try {
-                grab();
-            } catch (IOException e) {
-                Logger.log(e);
-            }
+            grab();
 
             /*
             long time = System.currentTimeMillis();
@@ -98,9 +94,12 @@ class ChatThread extends Thread
         }
     }
     
-    private void grab() throws IOException
+    private void grab()
     {
         final HTTPRequest req = HTTPRequest.req("/assets/chat-output.php", null);
+        if (req == null) {
+            return;
+        }
         final String res = req.response;
         
         if (res == null) {

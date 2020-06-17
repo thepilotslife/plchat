@@ -1,7 +1,6 @@
 package plchat;
 
 import java.io.*;
-import java.net.*;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 
@@ -30,8 +29,8 @@ public class HTTPRequest
     synchronized static HTTPRequest req(
         @NotNull String path,
         @Nullable String postdata)
-        throws IOException
     {
+        // TODO clean this up some time
         try {
             final HTTPRequest res = new HTTPRequest(path, postdata);
             if (!res.unexpectedclose) {
@@ -40,21 +39,35 @@ public class HTTPRequest
             Logger.log(
                 "call ended unexpected, re-opening socket and re-attempting same call"
             );
-        } catch (SocketException e) {
+        } catch (IOException e) {
             Logger.log(e);
-            Logger.log("socket exception, re-attempting same call");
+            Logger.log("ioexception, re-attempting same request");
         }
         try {
             socket.close();
             socket = null;
+            os = null;
+            is = null;
         } catch (Exception e) {
         }
-        return new HTTPRequest(path, postdata);
+        try {
+            HTTPRequest res = new HTTPRequest(path, postdata);
+            if (!res.unexpectedclose) {
+                return res;
+            }
+            Logger.log(
+                "call ended unexpected, 2nd try so not trying again"
+            );
+        } catch (IOException e) {
+            Logger.log(e);
+            Logger.log("exception again, dropping the request");
+        }
+        return null;
     }
     
     private static void ensureSocket()
     {
-        if (socket == null || socket.isClosed()) {
+        if (socket == null || socket.isClosed() || os == null || is == null) {
             Logger.log("socket is null or closed, opening a new one");
             Logger.log("keep alive: had requests x" + keepaliverequests);
             keepaliverequests = 0;
