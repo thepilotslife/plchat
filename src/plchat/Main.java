@@ -363,8 +363,8 @@ public class Main
                 try {
                     int interest = Integer.parseInt(params[1]);
                     String m = "";
-                    if (interest > 268434) {
-                        interest = 268434;
+                    if (interest > 1431655) {
+                        interest = 1431655;
                         m = "(overflow) ";
                     }
                     final int value = interest * 1500;
