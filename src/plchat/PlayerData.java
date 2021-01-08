@@ -91,12 +91,12 @@ public class PlayerData
         return pd;
     }
     
-    /*
     public static void main(String[] args) throws Exception {
         Main.init();
-        forName("robin_be");
+        ChatThread.login();
+        PlayerData pd = forName("robin_be");
+        System.out.println(pd);
     }
-    */
     
     String name;
     long parseTime;
@@ -194,7 +194,7 @@ public class PlayerData
     {
         try {
             idx += 6; // skip Owner Location Price Slots Last Visit
-            
+            idx--; // Last Visit got removed
             while (idx < parts.length) {
                 if ("Player Vehicles".equals(parts[idx])) {
                     break;
@@ -208,9 +208,11 @@ public class PlayerData
                 this.totalHouseCost += house.cost;
                 this.totalHouseSlots += house.slots;
                 idx += 5;
+                idx--; // Last Visit got removed
             }
             
             idx += 6; // skip Vehicle Location Max Speed Price Last Visit
+            idx--; // Last Visit got removed
             while (idx < parts.length) {
                 if (parts[idx].trim().isEmpty()) {
                     break;
@@ -222,6 +224,7 @@ public class PlayerData
                 this.cars.add(car);
                 this.totalCarCost += car.cost;
                 idx += 5;
+                idx--; // Last Visit got removed
             }
         } catch (Exception e) {
             Logger.log(e);
