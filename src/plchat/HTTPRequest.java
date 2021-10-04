@@ -20,12 +20,12 @@ public class HTTPRequest
     static OutputStream os;
     static String phpsess;
     static int keepaliverequests;
-    
+
     private int contentLength;
     private boolean chunked;
     boolean unexpectedclose;
     String response;
-    
+
     synchronized static HTTPRequest req(
         @NotNull String path,
         @Nullable String postdata)
@@ -64,7 +64,7 @@ public class HTTPRequest
         }
         return null;
     }
-    
+
     private static void ensureSocket()
     {
         if (socket == null || socket.isClosed() || os == null || is == null) {
@@ -98,7 +98,7 @@ public class HTTPRequest
             }
         };
     }
-    
+
     static void shutdown()
     {
         if (socket != null) {
@@ -144,9 +144,9 @@ public class HTTPRequest
             os.write(postdata.getBytes());
         }
         os.flush();
-        
+
         keepaliverequests++;
-        
+
         final StringBuilder sb = new StringBuilder();
         int prev = 0;
         while (true) {
@@ -169,7 +169,7 @@ public class HTTPRequest
             }
             prev = i;
         }
-        
+
         if (this.chunked) {
             Logger.log("reading chunked response");
             this.readChunked();
@@ -181,18 +181,18 @@ public class HTTPRequest
             this.unexpectedclose = false;
             return;
         }
-        
+
         int actuallyread = 0;
         byte[] content = new byte[this.contentLength];
         while (actuallyread != this.contentLength) {
             int bytestoread = content.length - actuallyread;
             actuallyread += is.read(content, actuallyread, bytestoread);
         }
-        
+
         this.response = new String(content);
         this.unexpectedclose = false;
     }
-    
+
     private void readChunked() throws IOException
     {
         byte[] content = new byte[0];
@@ -212,9 +212,9 @@ public class HTTPRequest
                 }
                 chunksizestr.append((char) i);
             }
-            
+
             int chunksize = Integer.parseInt(chunksizestr.toString(), 16);
-            
+
             Logger.log("chunksize " + chunksize);
             if (chunksize == 0) {
                 if (is.read() == -1 || is.read() == -1) {
@@ -229,14 +229,14 @@ public class HTTPRequest
                 int bytestoread = chunkcontent.length - actuallyread;
                 actuallyread += is.read(chunkcontent, actuallyread, bytestoread);
             }
-            
+
             byte[] newcontent = new byte[content.length + chunkcontent.length];
             if (content.length > 0) {
                 arraycopy(content, 0, newcontent, 0, content.length);
             }
             arraycopy(chunkcontent, 0, newcontent, content.length, chunkcontent.length);
             content = newcontent;
-            
+
             if (is.read() == -1 || is.read() == -1) {
                 Logger.log("unexpected close (chunk end)");
             }
@@ -245,12 +245,14 @@ public class HTTPRequest
         this.response = new String(content);
         this.unexpectedclose = false;
     }
-    
+
     private void readHeaderLine(@NotNull String line)
     {
         //System.out.println(line);
 
-        if (line.startsWith("Set-Cookie:")) {
+        String lower = line.toLowerCase();
+
+        if (lower.startsWith("set-cookie:")) {
             String part = line.substring(11).trim();
             int end = part.indexOf(';');
             if (end != -1) {
@@ -264,12 +266,12 @@ public class HTTPRequest
                 }
             }
         }
-        
-        if (line.startsWith("Content-Length:")) {
+
+        if (lower.startsWith("content-length:")) {
             this.contentLength = Integer.parseInt(line.substring(15).trim());
         }
-        
-        if (line.startsWith("Transfer-Encoding: chunked")) {
+
+        if (lower.startsWith("transfer-encoding: chunked")) {
             this.chunked = true;
         }
     }
