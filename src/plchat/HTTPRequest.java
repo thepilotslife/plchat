@@ -1,6 +1,8 @@
 package plchat;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 
@@ -20,6 +22,7 @@ public class HTTPRequest
     static OutputStream os;
     static String phpsess;
     static int keepaliverequests;
+    static Charset cs = StandardCharsets.UTF_8;
 
     private int contentLength;
     private boolean chunked;
@@ -189,7 +192,7 @@ public class HTTPRequest
             actuallyread += is.read(content, actuallyread, bytestoread);
         }
 
-        this.response = new String(content);
+        this.response = new String(content, cs);
         this.unexpectedclose = false;
     }
 
@@ -242,7 +245,7 @@ public class HTTPRequest
             }
         }
 
-        this.response = new String(content);
+        this.response = new String(content, cs);
         this.unexpectedclose = false;
     }
 

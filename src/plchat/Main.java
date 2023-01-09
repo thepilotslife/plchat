@@ -9,6 +9,7 @@ import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Consumer;
@@ -152,7 +153,7 @@ public class Main
     {
         if (sockout != null) {
             try {
-                byte[] m = msg.getBytes();
+                byte[] m = msg.getBytes(StandardCharsets.UTF_8);
                 sockout.send(new DatagramPacket(m, m.length, ADDR_LOCAL, 5056));
             } catch (Exception e) {
                 Logger.log(e);
@@ -182,6 +183,7 @@ public class Main
         p = new Properties();
         try (FileInputStream is = new FileInputStream(propfile)) {
             p.load(is);
+            HTTPRequest.cs = Charset.forName(p.getProperty("charset", "windows-1252"));
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("make sure file 'user.properties' exists");
