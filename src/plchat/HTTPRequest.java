@@ -92,7 +92,7 @@ public class HTTPRequest
                     },
                 }, new SecureRandom());
                 SSLSocketFactory sf = sslContext.getSocketFactory();
-                socket = (SSLSocket) sf.createSocket("51.178.2.56", 443);
+                socket = (SSLSocket) sf.createSocket("thepilotslife.com", 443);
                 os = socket.getOutputStream();
                 is = socket.getInputStream();
                 socket.setKeepAlive(true);
